@@ -1,0 +1,72 @@
+<project name = "SimpleJavaProject" default="help">
+	<target name="help">
+	<echo> ant compile: compile the project</echo>
+	<echo> ant junit: run unit test</echo>
+	<echo> ant fit: run fit tests</echo>
+	</target>
+	<property name="src" location="src" />
+	<property name="src.test" location="src/test" />
+	<property name="bin" location="bin" />
+	<property name="lib" location="lib" />
+	<property name="report" location="report" />
+	<property name="junit.report" location="report/junit" />
+	<property name="bin.test" location="bin/test"/>
+	<property name="test.class.name" value="test.CalculatorTest"/>
+	<property name="fit" location="fit" />
+	<property name="fit.report" location="report/fit" />
+	
+	<path id="lib.classpath">
+		<fileset dir="${lib}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+		
+	<path id="test.classpath">
+		<path refid="lib.classpath" />
+		<pathelement location="${bin}" />
+	</path>
+			
+	<target name="default">
+		<property name="myclasspath" refid="test.classpath"/>
+		<echo message="Classpath = ${myclasspath}"/>
+		</target>
+	
+	<target name="compile">
+		<mkdir dir="${bin}" />
+		<javac srcdir="${src}" destdir="${bin}">
+			<classpath refid="lib.classpath" />
+		</javac>
+	</target>
+		
+	<target name="junit" depends="compile">
+		<mkdir dir="${junit.report}" />
+		<junit printsummary="yes" fork="yes" haltonfailure="no">
+			<test name="${test.class.name}" />
+			<classpath refid="test.classpath"/>
+			<formatter type="plain"/>
+			<batchtest fork="yes" todir="${junit.report}">
+				<fileset dir="${bin}">
+					<include name="**/*Test.class"/>
+				</fileset>
+			</batchtest>
+			
+		</junit>
+	</target>
+		
+	<target name="fit" depends="compile">
+		<mkdir dir="${fit.report}" />
+		<java classname="fitlibrary.runner.FolderRunner" fork="yes"
+			failonerror="no">
+		<classpath refid="test.classpath"/>
+			<arg value="${fit}" />
+			<arg value="${fit.report}" />
+			</java>
+			<echo> Please see the FIT report page for more details </echo>
+	</target>
+			
+			<target name="clean">
+			<delete dir="${bin}" />
+			<delete dir="${report}"/>
+		</target>
+			
+</project>
